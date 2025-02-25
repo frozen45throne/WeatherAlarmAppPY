@@ -25,6 +25,12 @@ Run the application:
 python main.py
 ```
 
+Or grab the application (.EXE) from
+
+```
+dist
+```
+
 ### Weather Tab
 
 - Enter a city name in the input field
