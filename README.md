@@ -1,6 +1,6 @@
 # Weather & Alarm Application
 
-A desktop application that combines weather information and alarm functionality, built with PyQt5.
+A desktop application that combines weather information, alarm functionality, and note-taking capabilities, built with PyQt5.
 
 ## Features
 
@@ -36,6 +36,16 @@ A desktop application that combines weather information and alarm functionality,
 - Auto-dismiss options
 - Visual alarm list
 - Delete functionality for existing alarms
+
+### Note-Taking
+
+- Create, edit, and delete notes
+- Organize notes by categories
+- Filter notes by text search and category
+- Sort notes by creation date (newest first)
+- Persistent storage of notes between sessions
+- Add custom categories for better organization
+- Clean, intuitive interface for note management
 
 ### System Integration
 
@@ -110,6 +120,18 @@ The application supports both SVG and PNG weather icons, located in:
 3. Add optional alarm label
 4. Manage alarms through the list interface
 
+### Notes Tab
+
+1. Create new notes with the "New Note" button
+2. Enter a title, content, and select a category
+3. View all notes in the list, sorted by creation date
+4. Filter notes by:
+   - Text search (searches in titles and content)
+   - Category selection
+5. Edit notes by double-clicking or selecting and clicking "Edit"
+6. Delete notes with the "Delete" button
+7. Add custom categories with the "Add Category" button
+
 ### Settings Tab
 
 Configure:
@@ -139,6 +161,7 @@ WACAppPush/
 │   └── widgets/
 │       ├── __init__.py
 │       ├── alarm_widget.py
+│       ├── note_widget.py
 │       ├── settings_widget.py
 │       └── weather_widget.py
 ├── weather_icons/

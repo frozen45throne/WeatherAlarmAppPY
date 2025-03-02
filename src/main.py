@@ -16,6 +16,7 @@ from PyQt5.QtGui import QIcon, QPixmap, QPainter
 from .widgets.weather_widget import WeatherWidget
 from .widgets.alarm_widget import AlarmWidget
 from .widgets.settings_widget import SettingsWidget
+from .widgets.note_widget import NoteWidget
 from .utils.theme_manager import ThemeManager, Theme
 from .utils.alarm_manager import AlarmManager
 from .config import APP_ICON_PATH
@@ -97,6 +98,10 @@ class MainWindow(QMainWindow):
         # Create alarm widget
         self.alarm_widget = AlarmWidget()
         self.tab_widget.addTab(self.alarm_widget, "Alarms")
+        
+        # Create notes widget
+        self.note_widget = NoteWidget()
+        self.tab_widget.addTab(self.note_widget, "Notes")
         
         # Create settings widget
         self.settings_widget = SettingsWidget()
