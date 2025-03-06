@@ -22,6 +22,13 @@ A desktop application that combines weather information, alarm functionality, an
   - Weather descriptions for each day
   - Day-of-week display
 
+- **Weather Map**:
+
+  - Interactive weather map visualization
+  - Multiple map layers (clouds, precipitation, temperature, wind)
+  - Zoom and pan functionality
+  - Real-time updates with location changes
+
 - **User Interface**:
   - Clean, modern design with material styling
   - Responsive search with Enter key support
@@ -47,12 +54,41 @@ A desktop application that combines weather information, alarm functionality, an
 - Add custom categories for better organization
 - Clean, intuitive interface for note management
 
+### Calendar
+
+- Add and manage calendar events
+- Day, week, and month views
+- Event reminders and notifications
+- Color-coded event categories
+- Recurring event support
+- Event search functionality
+- Integration with the notification system
+
+### Notifications
+
+- System-wide notifications for important events
+- Weather forecast notifications
+- Alarm notifications with sound
+- Calendar event reminders
+- Customizable notification settings
+- Notification history and management
+- Mark as read/unread functionality
+- Clear all or individual notifications
+
 ### System Integration
 
 - System tray support for background operation
 - Minimized operation support
 - Automatic error handling and logging
 - Graceful handling of API issues
+
+### Theming
+
+- Light and dark theme support
+- System theme detection
+- Material Design color schemes
+- Consistent styling across all widgets
+- Dynamic theme switching without application restart
 
 ## Requirements
 
@@ -90,6 +126,16 @@ The application uses OpenWeatherMap API for weather data. You can set your API k
 2. Settings tab in the application
 3. Direct configuration in config.py
 
+### Theme Configuration
+
+The application supports three theme modes:
+
+1. **Light Theme**: A clean, light-colored interface
+2. **Dark Theme**: A modern dark interface that reduces eye strain
+3. **System Theme**: Automatically follows your system's theme settings
+
+You can change the theme in the Settings tab. Theme changes are applied immediately and saved for future sessions.
+
 ### Weather Icons
 
 The application supports both SVG and PNG weather icons, located in:
@@ -113,6 +159,18 @@ The application supports both SVG and PNG weather icons, located in:
    - Weather icons specific to predicted conditions
    - Day names and descriptions
 
+### Weather Map Tab
+
+1. Navigate to the Weather Map tab
+2. View the interactive weather map for your current location
+3. Change map layers using the dropdown menu:
+   - Clouds
+   - Precipitation
+   - Temperature
+   - Wind
+4. Zoom in/out and pan to explore different regions
+5. The map automatically updates when you search for a new location
+
 ### Alarms Tab
 
 1. Set alarm time using the time picker
@@ -132,15 +190,44 @@ The application supports both SVG and PNG weather icons, located in:
 6. Delete notes with the "Delete" button
 7. Add custom categories with the "Add Category" button
 
+### Calendar Tab
+
+1. Navigate to the Calendar tab
+2. Choose between day, week, or month views
+3. Add new events by clicking on a date/time slot
+4. Configure event details:
+   - Title and description
+   - Start and end times
+   - Category/color
+   - Reminder settings
+5. Edit events by double-clicking on them
+6. Delete events using the context menu
+7. Search for events using the search bar
+
+### Notifications Tab
+
+1. View all notifications in the Notifications tab
+2. Filter notifications by type:
+   - All
+   - Weather
+   - Alarms
+   - Calendar
+   - System
+3. Mark notifications as read/unread
+4. Clear individual notifications or all at once
+5. Click on a notification to navigate to the relevant section
+
 ### Settings Tab
 
 Configure:
 
-- Theme preferences
+- Theme preferences (Light, Dark, or System)
 - API key
 - Default city
 - Units (metric/imperial)
 - Alarm settings
+- Notification preferences
+- Calendar display options
 
 ## Development Structure
 
@@ -152,24 +239,53 @@ WACAppPush/
 │   ├── main.py
 │   ├── services/
 │   │   ├── __init__.py
-│   │   └── weather_service.py
+│   │   ├── weather_service.py
+│   │   └── calendar_service.py
 │   ├── utils/
 │   │   ├── __init__.py
 │   │   ├── alarm_manager.py
 │   │   ├── svg_handler.py
-│   │   └── theme_manager.py
+│   │   ├── theme_manager.py
+│   │   └── notification_manager.py
 │   └── widgets/
 │       ├── __init__.py
 │       ├── alarm_widget.py
 │       ├── note_widget.py
 │       ├── settings_widget.py
-│       └── weather_widget.py
+│       ├── weather_widget.py
+│       ├── weather_map_widget.py
+│       ├── calendar_widget.py
+│       └── notification_widget.py
 ├── weather_icons/
 ├── animation-ready/
 ├── run.py
 ├── requirements.txt
 └── README.md
 ```
+
+## Recent Updates
+
+### New Features
+
+The application has been enhanced with several new features:
+
+- **Interactive Weather Map**: View weather patterns on an interactive map with multiple layer options
+- **Calendar Integration**: Manage events and appointments with day, week, and month views
+- **Notification System**: Stay informed with a comprehensive notification system for weather, alarms, and calendar events
+
+### Dark Theme Improvements
+
+The application has been updated with the following improvements to the dark theme:
+
+- Fixed inconsistent background colors in weather displays
+- Removed hardcoded light background colors from UI components
+- Enhanced container widget styling for better theme consistency
+- Improved text contrast in dark mode
+- Added transparent backgrounds for scrollable areas
+- Updated hover effects to work well in both light and dark themes
+- Ensured proper theme application across all widgets
+
+These changes ensure a consistent and visually appealing dark theme experience throughout the application.
 
 ## Error Handling
 

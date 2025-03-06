@@ -38,19 +38,26 @@ class ThemeManager:
     }
     
     DARK_PALETTE = {
-        QPalette.Window: QColor(53, 53, 53),
-        QPalette.WindowText: QColor(255, 255, 255),
-        QPalette.Base: QColor(25, 25, 25),
-        QPalette.AlternateBase: QColor(53, 53, 53),
-        QPalette.ToolTipBase: QColor(53, 53, 53),
-        QPalette.ToolTipText: QColor(255, 255, 255),
-        QPalette.Text: QColor(255, 255, 255),
-        QPalette.Button: QColor(53, 53, 53),
-        QPalette.ButtonText: QColor(255, 255, 255),
-        QPalette.BrightText: QColor(255, 0, 0),
-        QPalette.Link: QColor(42, 130, 218),
-        QPalette.Highlight: QColor(42, 130, 218),
-        QPalette.HighlightedText: QColor(255, 255, 255),
+        QPalette.Window: QColor(33, 33, 33),           # Darker background
+        QPalette.WindowText: QColor(255, 255, 255),    # White text
+        QPalette.Base: QColor(18, 18, 18),             # Even darker for input fields
+        QPalette.AlternateBase: QColor(45, 45, 45),    # Slightly lighter for alternating rows
+        QPalette.ToolTipBase: QColor(33, 33, 33),      # Dark tooltip background
+        QPalette.ToolTipText: QColor(255, 255, 255),   # White tooltip text
+        QPalette.Text: QColor(255, 255, 255),          # White text
+        QPalette.Button: QColor(45, 45, 45),           # Slightly lighter for buttons
+        QPalette.ButtonText: QColor(255, 255, 255),    # White button text
+        QPalette.BrightText: QColor(255, 128, 128),    # Light red for bright text
+        QPalette.Link: QColor(66, 165, 245),           # Lighter blue for links
+        QPalette.Highlight: QColor(33, 150, 243),      # Blue highlight
+        QPalette.HighlightedText: QColor(255, 255, 255), # White text on highlight
+        QPalette.Disabled: {                           # Disabled state colors
+            QPalette.WindowText: QColor(128, 128, 128),
+            QPalette.Text: QColor(128, 128, 128),
+            QPalette.ButtonText: QColor(128, 128, 128),
+            QPalette.Highlight: QColor(80, 80, 80),
+            QPalette.HighlightedText: QColor(180, 180, 180)
+        }
     }
     
     # Material Design color schemes
@@ -68,16 +75,21 @@ class ThemeManager:
     }
     
     MATERIAL_DARK = {
-        "primary": QColor(33, 150, 243),  # Blue 500
-        "primary_light": QColor(100, 181, 246),  # Blue 300
-        "primary_dark": QColor(25, 118, 210),  # Blue 700
-        "accent": QColor(255, 64, 129),  # Pink A400
+        "primary": QColor(33, 150, 243),        # Blue 500
+        "primary_light": QColor(100, 181, 246), # Blue 300
+        "primary_dark": QColor(25, 118, 210),   # Blue 700
+        "accent": QColor(255, 64, 129),         # Pink A400
         "text_primary": QColor(255, 255, 255),  # White
-        "text_secondary": QColor(189, 189, 189),  # Grey 400
-        "divider": QColor(97, 97, 97),  # Grey 700
-        "background": QColor(48, 48, 48),  # Grey 900
-        "card": QColor(66, 66, 66),  # Grey 800
-        "error": QColor(244, 67, 54),  # Red 500
+        "text_secondary": QColor(189, 189, 189), # Grey 400
+        "divider": QColor(66, 66, 66),          # Darker divider
+        "background": QColor(33, 33, 33),       # Darker background
+        "card": QColor(45, 45, 45),             # Slightly lighter card background
+        "error": QColor(244, 67, 54),           # Red 500
+        "surface": QColor(18, 18, 18),          # Even darker surface
+        "on_surface": QColor(255, 255, 255),    # White text on surface
+        "disabled": QColor(97, 97, 97),         # Grey 700 for disabled elements
+        "hover": QColor(55, 55, 55),            # Slightly lighter for hover states
+        "selected": QColor(66, 165, 245, 50)    # Semi-transparent blue for selected items
     }
     
     def __init__(self, theme=Theme.SYSTEM):
@@ -112,13 +124,22 @@ class ThemeManager:
         if theme == Theme.LIGHT:
             # Apply light theme
             for role, color in self.LIGHT_PALETTE.items():
-                palette.setColor(role, color)
+                if role != QPalette.Disabled:
+                    palette.setColor(role, color)
             self.material_colors = self.MATERIAL_LIGHT
             logger.info("Applied light theme")
         elif theme == Theme.DARK:
             # Apply dark theme
             for role, color in self.DARK_PALETTE.items():
-                palette.setColor(role, color)
+                if role != QPalette.Disabled:
+                    palette.setColor(role, color)
+                    
+            # Handle disabled state separately
+            if QPalette.Disabled in self.DARK_PALETTE:
+                disabled_colors = self.DARK_PALETTE[QPalette.Disabled]
+                for role, color in disabled_colors.items():
+                    palette.setColor(QPalette.Disabled, role, color)
+                    
             self.material_colors = self.MATERIAL_DARK
             logger.info("Applied dark theme")
         elif theme == Theme.SYSTEM:
@@ -160,38 +181,28 @@ class ThemeManager:
             str: CSS stylesheet for the current theme
         """
         # Convert material colors to CSS variables
-        colors = {name: f"rgba({color.red()}, {color.green()}, {color.blue()}, {color.alpha()/255})" 
+        colors = {name: f"rgb({color.red()}, {color.green()}, {color.blue()})" 
                  for name, color in self.material_colors.items()}
         
         # Create a stylesheet with CSS variables
         stylesheet = f"""
-        /* Material Design Theme Variables */
-        QWidget {{
-            --primary: {colors['primary']};
-            --primary-light: {colors['primary_light']};
-            --primary-dark: {colors['primary_dark']};
-            --accent: {colors['accent']};
-            --text-primary: {colors['text_primary']};
-            --text-secondary: {colors['text_secondary']};
-            --divider: {colors['divider']};
-            --background: {colors['background']};
-            --card: {colors['card']};
-            --error: {colors['error']};
-        }}
-        
         /* Base Styles */
         QWidget {{
-            background-color: var(--background);
-            color: var(--text-primary);
+            background-color: {colors['background']};
+            color: {colors['text_primary']};
+        }}
+        
+        QMainWindow, QDialog {{
+            background-color: {colors['background']};
         }}
         
         QFrame {{
-            background-color: var(--card);
+            background-color: {colors.get('surface', colors['card'])};
             border-radius: 4px;
         }}
         
         QPushButton {{
-            background-color: var(--primary);
+            background-color: {colors['primary']};
             color: white;
             border: none;
             border-radius: 4px;
@@ -200,55 +211,156 @@ class ThemeManager:
         }}
         
         QPushButton:hover {{
-            background-color: var(--primary-dark);
+            background-color: {colors['primary_dark']};
         }}
         
         QPushButton:pressed {{
-            background-color: var(--primary-light);
+            background-color: {colors['primary_light']};
         }}
         
-        QLineEdit, QComboBox, QSpinBox, QTimeEdit {{
-            border: 1px solid var(--divider);
+        QPushButton:disabled {{
+            background-color: {colors.get('disabled', 'rgb(97, 97, 97)')};
+            color: rgba(255, 255, 255, 0.5);
+        }}
+        
+        QLineEdit, QComboBox, QSpinBox, QTimeEdit, QDateEdit, QDateTimeEdit {{
+            border: 1px solid {colors['divider']};
             border-radius: 4px;
             padding: 8px;
-            background-color: var(--card);
-            color: var(--text-primary);
+            background-color: {colors.get('surface', colors['card'])};
+            color: {colors['text_primary']};
+            selection-background-color: {colors['primary']};
+            selection-color: white;
+        }}
+        
+        QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QTimeEdit:focus, QDateEdit:focus, QDateTimeEdit:focus {{
+            border: 1px solid {colors['primary']};
         }}
         
         QLabel {{
-            color: var(--text-primary);
+            color: {colors['text_primary']};
+            background-color: transparent;
         }}
         
         QTabWidget::pane {{
-            border: 1px solid var(--divider);
+            border: 1px solid {colors['divider']};
             border-radius: 4px;
+            background-color: {colors['card']};
         }}
         
         QTabBar::tab {{
-            background-color: var(--background);
-            color: var(--text-secondary);
+            background-color: {colors['background']};
+            color: {colors['text_secondary']};
             padding: 8px 16px;
             border-bottom: 2px solid transparent;
         }}
         
         QTabBar::tab:selected {{
-            color: var(--primary);
-            border-bottom: 2px solid var(--primary);
+            color: {colors['primary']};
+            border-bottom: 2px solid {colors['primary']};
+        }}
+        
+        QTabBar::tab:hover:!selected {{
+            color: {colors['text_primary']};
+            background-color: {colors.get('hover', 'rgb(55, 55, 55)')};
         }}
         
         QScrollBar {{
-            background-color: var(--background);
+            background-color: {colors['background']};
             width: 12px;
             height: 12px;
         }}
         
         QScrollBar::handle {{
-            background-color: var(--divider);
+            background-color: {colors['divider']};
             border-radius: 6px;
+        }}
+        
+        QScrollBar::handle:hover {{
+            background-color: {colors.get('hover', 'rgb(55, 55, 55)')};
         }}
         
         QScrollBar::add-line, QScrollBar::sub-line {{
             background: none;
+        }}
+        
+        QScrollArea {{
+            background-color: transparent;
+            border: none;
+        }}
+        
+        QScrollArea > QWidget > QWidget {{
+            background-color: transparent;
+        }}
+        
+        QMenu {{
+            background-color: {colors['card']};
+            border: 1px solid {colors['divider']};
+            border-radius: 4px;
+        }}
+        
+        QMenu::item {{
+            padding: 6px 16px;
+            color: {colors['text_primary']};
+        }}
+        
+        QMenu::item:selected {{
+            background-color: {colors.get('selected', 'rgba(66, 165, 245, 0.2)')};
+        }}
+        
+        QCheckBox {{
+            color: {colors['text_primary']};
+            background-color: transparent;
+        }}
+        
+        QCheckBox::indicator {{
+            width: 18px;
+            height: 18px;
+            border: 1px solid {colors['divider']};
+            border-radius: 2px;
+            background-color: {colors.get('surface', colors['card'])};
+        }}
+        
+        QCheckBox::indicator:checked {{
+            background-color: {colors['primary']};
+            border-color: {colors['primary']};
+        }}
+        
+        QGroupBox {{
+            border: 1px solid {colors['divider']};
+            border-radius: 4px;
+            margin-top: 1.5ex;
+            padding-top: 1ex;
+            font-weight: bold;
+        }}
+        
+        QGroupBox::title {{
+            subcontrol-origin: margin;
+            subcontrol-position: top left;
+            padding: 0 3px;
+            color: {colors['text_primary']};
+            background-color: transparent;
+        }}
+        
+        QListView, QTreeView, QTableView {{
+            background-color: {colors.get('surface', colors['card'])};
+            border: 1px solid {colors['divider']};
+            border-radius: 4px;
+            alternate-background-color: {colors.get('hover', 'rgb(55, 55, 55)')};
+        }}
+        
+        QListView::item:selected, QTreeView::item:selected, QTableView::item:selected {{
+            background-color: {colors.get('selected', 'rgba(66, 165, 245, 0.2)')};
+            color: {colors['text_primary']};
+        }}
+        
+        QHeaderView::section {{
+            background-color: {colors['card']};
+            color: {colors['text_secondary']};
+            padding: 4px;
+            border: none;
+            border-right: 1px solid {colors['divider']};
+            border-bottom: 1px solid {colors['divider']};
         }}
         """
         

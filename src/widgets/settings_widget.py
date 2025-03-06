@@ -164,82 +164,102 @@ class SettingsWidget(QWidget):
     def load_settings(self):
         """Load settings from QSettings."""
         # Load theme
-        theme_str = self.settings.value("theme", Theme.SYSTEM.value)
-        theme_index = self.theme_combo.findData(Theme(theme_str))
-        if theme_index >= 0:
-            self.theme_combo.setCurrentIndex(theme_index)
+        theme_value = self.settings.value("theme", "system")
+        theme_index = 2  # Default to system theme
+        
+        if theme_value == "light":
+            theme_index = 0
+        elif theme_value == "dark":
+            theme_index = 1
+            
+        self.theme_combo.setCurrentIndex(theme_index)
         
         # Load startup setting
-        self.startup_check.setChecked(self.settings.value("startup", False, type=bool))
+        startup = self.settings.value("startOnStartup", False, type=bool)
+        self.startup_check.setChecked(startup)
         
         # Load default city
-        self.default_city_edit.setText(self.settings.value("defaultCity", ""))
+        default_city = self.settings.value("defaultCity", "")
+        self.default_city_edit.setText(default_city)
         
         # Load units
-        units = self.settings.value("units", "metric")
-        units_index = self.units_combo.findData(units)
-        if units_index >= 0:
-            self.units_combo.setCurrentIndex(units_index)
+        units = self.settings.value("weatherUnits", "metric")
+        units_index = 0  # Default to metric
+        
+        if units == "imperial":
+            units_index = 1
+        elif units == "standard":
+            units_index = 2
+            
+        self.units_combo.setCurrentIndex(units_index)
         
         # Load API key
-        self.api_key_edit.setText(self.settings.value("apiKey", ""))
+        api_key = self.settings.value("apiKey", "")
+        self.api_key_edit.setText(api_key)
         
         # Load refresh interval
-        refresh = self.settings.value("refreshInterval", 30, type=int)
-        refresh_index = self.refresh_combo.findData(refresh)
-        if refresh_index >= 0:
-            self.refresh_combo.setCurrentIndex(refresh_index)
+        refresh = self.settings.value("weatherRefreshInterval", 30, type=int)
+        refresh_index = 1  # Default to 30 minutes
+        
+        if refresh == 15:
+            refresh_index = 0
+        elif refresh == 60:
+            refresh_index = 2
+        elif refresh == 180:
+            refresh_index = 3
+            
+        self.refresh_combo.setCurrentIndex(refresh_index)
         
         # Load alarm sound
-        self.alarm_sound_edit.setText(self.settings.value("alarmSound", ""))
+        alarm_sound = self.settings.value("alarmSound", "")
+        self.alarm_sound_edit.setText(alarm_sound)
         
         # Load alarm duration
         duration = self.settings.value("alarmDuration", 60, type=int)
-        duration_index = self.alarm_duration_combo.findData(duration)
-        if duration_index >= 0:
-            self.alarm_duration_combo.setCurrentIndex(duration_index)
+        duration_index = 1  # Default to 60 seconds
+        
+        if duration == 30:
+            duration_index = 0
+        elif duration == 120:
+            duration_index = 2
+        elif duration == 300:
+            duration_index = 3
+            
+        self.alarm_duration_combo.setCurrentIndex(duration_index)
         
         # Load auto-dismiss
-        self.auto_dismiss_check.setChecked(self.settings.value("autoDismiss", True, type=bool))
+        auto_dismiss = self.settings.value("autoDismiss", True, type=bool)
+        self.auto_dismiss_check.setChecked(auto_dismiss)
         
         logger.debug("Settings loaded")
     
     def save_settings(self):
         """Save settings to QSettings."""
-        # Save theme
-        theme = self.theme_combo.currentData()
-        self.settings.setValue("theme", theme.value)
+        # Get theme
+        theme_index = self.theme_combo.currentIndex()
+        theme_data = self.theme_combo.itemData(theme_index)
+        theme_name = theme_data.value if theme_data else "system"
         
-        # Save startup setting
-        self.settings.setValue("startup", self.startup_check.isChecked())
-        
-        # Save default city
+        # Save settings
+        self.settings.setValue("theme", theme_name)
+        self.settings.setValue("startOnStartup", self.startup_check.isChecked())
         self.settings.setValue("defaultCity", self.default_city_edit.text())
-        
-        # Save units
-        self.settings.setValue("units", self.units_combo.currentData())
-        
-        # Save API key
+        self.settings.setValue("weatherUnits", self.units_combo.currentData())
         self.settings.setValue("apiKey", self.api_key_edit.text())
-        
-        # Save refresh interval
-        self.settings.setValue("refreshInterval", self.refresh_combo.currentData())
-        
-        # Save alarm sound
+        self.settings.setValue("weatherRefreshInterval", self.refresh_combo.currentData())
         self.settings.setValue("alarmSound", self.alarm_sound_edit.text())
-        
-        # Save alarm duration
         self.settings.setValue("alarmDuration", self.alarm_duration_combo.currentData())
-        
-        # Save auto-dismiss
         self.settings.setValue("autoDismiss", self.auto_dismiss_check.isChecked())
         
         # Sync settings
         self.settings.sync()
         
+        # Get settings as dictionary
+        settings_dict = self.get_settings_dict()
+        
         # Emit signals
-        self.settings_changed.emit(self.get_settings_dict())
-        self.theme_changed.emit(theme)
+        self.settings_changed.emit(settings_dict)
+        self.theme_changed.emit(theme_data)
         
         # Show confirmation
         QMessageBox.information(self, "Settings Saved", "Your settings have been saved successfully.")
@@ -295,11 +315,11 @@ class SettingsWidget(QWidget):
         """
         return {
             "theme": self.theme_combo.currentData().value,
-            "startup": self.startup_check.isChecked(),
+            "startOnStartup": self.startup_check.isChecked(),
             "defaultCity": self.default_city_edit.text(),
-            "units": self.units_combo.currentData(),
+            "weatherUnits": self.units_combo.currentData(),
             "apiKey": self.api_key_edit.text(),
-            "refreshInterval": self.refresh_combo.currentData(),
+            "weatherRefreshInterval": self.refresh_combo.currentData(),
             "alarmSound": self.alarm_sound_edit.text(),
             "alarmDuration": self.alarm_duration_combo.currentData(),
             "autoDismiss": self.auto_dismiss_check.isChecked()

@@ -88,7 +88,6 @@ class WeatherWidget(QWidget):
             QFrame {
                 border: 1px solid #ccc;
                 border-radius: 8px;
-                background-color: rgba(255, 255, 255, 0.8);
             }
         """)
         
@@ -161,7 +160,7 @@ class WeatherWidget(QWidget):
         
         # Last updated
         self.updated_label = QLabel("Last updated: Never")
-        self.updated_label.setStyleSheet("font-size: 10px; color: #666;")
+        self.updated_label.setStyleSheet("font-size: 10px;")
         weather_layout.addWidget(self.updated_label, alignment=Qt.AlignRight)
         
         scroll_layout.addWidget(self.weather_frame)
@@ -177,7 +176,6 @@ class WeatherWidget(QWidget):
             QFrame {
                 border: 1px solid #ccc;
                 border-radius: 8px;
-                background-color: rgba(255, 255, 255, 0.8);
             }
         """)
         
