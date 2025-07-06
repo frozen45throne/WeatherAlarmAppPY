@@ -1,13 +1,14 @@
 """
-Alarm Manager Utility
--------------------
-This module provides utilities for managing alarms in the Weather & Alarm application.
+Alarm Manager Module
+----------------
+This module provides the AlarmManager class for managing alarms in the Weather & Alarm application.
 """
 import logging
 import json
 import os
+import uuid
 from datetime import datetime, timedelta
-from PyQt5.QtCore import QObject, QTimer, pyqtSignal, QTime
+from PyQt6.QtCore import QObject, QTimer, pyqtSignal, QTime
 
 from ..config import DEFAULT_ALARM_DURATION
 

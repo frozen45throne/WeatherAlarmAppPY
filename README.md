@@ -1,8 +1,48 @@
 # Weather & Alarm Application
 
-A desktop application that combines weather information, alarm functionality, and note-taking capabilities, built with PyQt5.
+A modern desktop application that combines weather information, alarm management, note-taking, calendar, and notifications, built with PyQt6. The app features a fully modernized UI, borderless window, and advanced system integration.
+
+## What's New (2025)
+
+- **Modern borderless window** with custom title bar and window controls
+- **Card-based layouts** for weather and forecast, with improved readability
+- **Enhanced alarm management**: modern time picker, improved alarm list
+- **Comprehensive note-taking** and **calendar** features
+- **Notification center**: cards, history, mark as read/unread, clear all
+- **System tray support** and background operation
+- **Improved error handling** and logging
+- **Refined dark theme** with semi-transparent elements and better contrast
 
 ## Features
+
+### Modern UI Design & Experience
+
+- **Consistent Design Language**:
+
+  - Dark theme with semi-transparent backgrounds
+  - Rounded corners and modern containers
+  - Blue accent color scheme (#2196F3, #90CAF9)
+  - Consistent spacing and padding across all widgets
+  - Improved visual hierarchy and typography
+  - **New**: Borderless window mode with custom title bar and custom window controls for a sleek, modern appearance
+
+- **Enhanced Interactive Elements**:
+
+  - Modern buttons with hover/pressed states
+  - Improved input controls with placeholder text
+  - Custom scrollbars with modern styling
+  - Smooth transitions and hover effects
+  - Focus states with blue accent borders
+  - **New**: Custom window controls (minimize, maximize, close) with hover effects and intuitive color feedback
+
+- **Layout Improvements**:
+  - Zero-margin main layouts with scroll areas
+  - 20px content padding for better readability
+  - 24px spacing between sections
+  - Consistent rounded frames with 10px radius
+  - Better organization of information
+  - **New**: Subtle window shadow effect for depth and modern aesthetics
+  - **New**: Rounded window corners for a modern look
 
 ### Weather Information
 
@@ -14,6 +54,7 @@ A desktop application that combines weather information, alarm functionality, an
   - Sunrise and sunset times
   - Last updated timestamp
   - Support for metric units
+  - **New**: Modern card-based layout with improved readability and visual feedback
 
 - **5-Day Forecast**:
 
@@ -21,13 +62,13 @@ A desktop application that combines weather information, alarm functionality, an
   - Dynamic weather icons based on temperature trends
   - Weather descriptions for each day
   - Day-of-week display
+  - **New**: Enhanced forecast cards with better visual separation and dynamic icons
 
-- **Weather Map**:
+- **Weather Map**: _(Feature currently disabled)_
 
-  - Interactive weather map visualization
-  - Multiple map layers (clouds, precipitation, temperature, wind)
-  - Zoom and pan functionality
-  - Real-time updates with location changes
+  - The interactive weather map feature is temporarily unavailable in this version.
+  - Map-related controls and layers are disabled.
+  - This section will be updated when the feature is re-enabled in a future release.
 
 - **User Interface**:
   - Clean, modern design with material styling
@@ -36,13 +77,15 @@ A desktop application that combines weather information, alarm functionality, an
   - Auto-refresh every 30 minutes
   - Manual refresh option
   - Scrollable interface for all weather information
+  - **New**: Enhanced visual feedback for user interactions and scrollable interface
 
 ### Alarm Management
 
 - Set and manage multiple alarms
 - Auto-dismiss options
-- Visual alarm list
+- Visual alarm list with improved styling
 - Delete functionality for existing alarms
+- **New**: Modern time picker, enhanced alarm list, and visual feedback
 
 ### Note-Taking
 
@@ -53,6 +96,7 @@ A desktop application that combines weather information, alarm functionality, an
 - Persistent storage of notes between sessions
 - Add custom categories for better organization
 - Clean, intuitive interface for note management
+- **New**: Enhanced note cards, improved dialog styling, and better filtering
 
 ### Calendar
 
@@ -63,6 +107,7 @@ A desktop application that combines weather information, alarm functionality, an
 - Recurring event support
 - Event search functionality
 - Integration with the notification system
+- **New**: Modern calendar styling, improved date selection, and event display
 
 ### Notifications
 
@@ -74,27 +119,30 @@ A desktop application that combines weather information, alarm functionality, an
 - Notification history and management
 - Mark as read/unread functionality
 - Clear all or individual notifications
+- **New**: Enhanced notification cards, improved visual hierarchy, notification center, and persistent history
 
-### System Integration
+### System Integration & Error Handling
 
 - System tray support for background operation
 - Minimized operation support
 - Automatic error handling and logging
 - Graceful handling of API issues
+- Improved error messages for missing API keys, network issues, and invalid input
 
-### Theming
+### Theming & Visual Feedback
 
-- Light and dark theme support
-- System theme detection
+- Modern dark theme throughout the application
 - Material Design color schemes
 - Consistent styling across all widgets
-- Dynamic theme switching without application restart
+- **New**: Enhanced dark theme with semi-transparent elements, improved contrast, and visual feedback for all interactions
 
 ## Requirements
 
 - Python 3.6+
-- PyQt5
+- PyQt6
+- PyQt6-WebEngine
 - Requests
+- python-dateutil
 
 ## Installation
 
@@ -128,13 +176,12 @@ The application uses OpenWeatherMap API for weather data. You can set your API k
 
 ### Theme Configuration
 
-The application supports three theme modes:
+The application features a modern dark theme with:
 
-1. **Light Theme**: A clean, light-colored interface
-2. **Dark Theme**: A modern dark interface that reduces eye strain
-3. **System Theme**: Automatically follows your system's theme settings
-
-You can change the theme in the Settings tab. Theme changes are applied immediately and saved for future sessions.
+- Semi-transparent backgrounds
+- Blue accent colors
+- Consistent rounded corners
+- Improved typography and spacing
 
 ### Weather Icons
 
@@ -221,7 +268,6 @@ The application supports both SVG and PNG weather icons, located in:
 
 Configure:
 
-- Theme preferences (Light, Dark, or System)
 - API key
 - Default city
 - Units (metric/imperial)
@@ -250,42 +296,58 @@ WACAppPush/
 │   └── widgets/
 │       ├── __init__.py
 │       ├── alarm_widget.py
-│       ├── note_widget.py
-│       ├── settings_widget.py
-│       ├── weather_widget.py
-│       ├── weather_map_widget.py
 │       ├── calendar_widget.py
-│       └── notification_widget.py
-├── weather_icons/
-├── animation-ready/
-├── run.py
-├── requirements.txt
-└── README.md
+│       ├── note_widget.py
+│       ├── notification_widget.py
+│       ├── settings_widget.py
+│       ├── weather_map_widget.py
+│       └── weather_widget.py
 ```
 
-## Recent Updates
+## UI Improvements
 
-### New Features
+The application has undergone a comprehensive UI modernization with the following key improvements:
 
-The application has been enhanced with several new features:
+1. **Consistent Component Design**
 
-- **Interactive Weather Map**: View weather patterns on an interactive map with multiple layer options
-- **Calendar Integration**: Manage events and appointments with day, week, and month views
-- **Notification System**: Stay informed with a comprehensive notification system for weather, alarms, and calendar events
+   - Added `RoundedFrame` component across all widgets for consistent container styling
+   - Standardized button styling with hover and pressed states
+   - Unified input field styling with consistent padding and borders
+   - Improved scrollbar styling for a modern look
+   - **New**: Borderless window with custom title bar and window controls
 
-### Dark Theme Improvements
+2. **Enhanced Visual Hierarchy**
 
-The application has been updated with the following improvements to the dark theme:
+   - Larger, bolder titles (28px) with accent color (#90CAF9)
+   - Consistent section headings and spacing
+   - Better content organization with proper padding and margins
+   - Improved contrast for better readability
+   - **New**: Window shadow effect for depth perception
 
-- Fixed inconsistent background colors in weather displays
-- Removed hardcoded light background colors from UI components
-- Enhanced container widget styling for better theme consistency
-- Improved text contrast in dark mode
-- Added transparent backgrounds for scrollable areas
-- Updated hover effects to work well in both light and dark themes
-- Ensured proper theme application across all widgets
+3. **Modern Color Scheme**
 
-These changes ensure a consistent and visually appealing dark theme experience throughout the application.
+   - Dark theme with semi-transparent backgrounds
+   - Blue accent colors (#2196F3, #90CAF9)
+   - Subtle borders with rgba(255, 255, 255, 0.1)
+   - Consistent hover and focus states
+   - **New**: Custom window controls with intuitive color feedback
+
+4. **Improved Layouts**
+
+   - Zero-margin main layouts with scroll areas
+   - 20px content padding
+   - 24px spacing between sections
+   - Consistent rounded frames with 10px radius
+   - **New**: Rounded window corners for a modern look
+
+5. **Interactive Elements**
+   - Hover effects on all clickable elements
+   - Focus states with blue borders
+   - Improved button styling with visual feedback
+   - Enhanced form controls with better styling
+   - **New**: Window dragging functionality via title bar
+
+These improvements create a cohesive, modern user experience across all widgets in the application.
 
 ## Error Handling
 
@@ -305,4 +367,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - Weather data provided by [OpenWeatherMap](https://openweathermap.org/)
 - Icons from various open-source projects
-- PyQt5 for the GUI framework
+- PyQt6 for the GUI framework

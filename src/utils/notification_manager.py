@@ -1,13 +1,13 @@
 """
 Notification Manager Module
 -----------------------
-This module provides the NotificationManager class for handling system notifications in the Weather & Alarm application.
+This module provides the NotificationManager class for managing notifications in the Weather & Alarm application.
 """
 import logging
-import os
+import uuid
 from datetime import datetime, timedelta
-from PyQt5.QtCore import QObject, pyqtSignal, QTimer
-from PyQt5.QtWidgets import QSystemTrayIcon
+from PyQt6.QtCore import QObject, pyqtSignal, QTimer
+from PyQt6.QtWidgets import QSystemTrayIcon
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -209,24 +209,26 @@ class NotificationManager(QObject):
     
     def show_notification(self, notification):
         """
-        Show a notification.
+        Show a notification in the system tray.
         
         Args:
             notification (Notification): Notification to show
         """
         if self.tray_icon:
-            # Determine icon
-            icon = notification.icon or QSystemTrayIcon.Information
+            # Get icon
+            icon = notification.icon or QSystemTrayIcon.MessageIcon.Information
             
             # Show notification
             self.tray_icon.showMessage(
                 notification.title,
                 notification.message,
                 icon,
-                5000  # Show for 5 seconds
+                3000  # Show for 3 seconds
             )
             
-            logger.info(f"Notification shown: {notification}")
+            logger.info(f"Showed notification: {notification}")
+        else:
+            logger.warning("No tray icon available to show notification")
     
     def schedule_notification(self, title, message, when, icon=None, category="general", data=None):
         """
@@ -321,10 +323,10 @@ class NotificationManager(QObject):
         Returns:
             dict: Scheduled notification data
         """
-        # Default to tomorrow morning if not specified
+        # Default to current day if not specified
         if not when:
-            tomorrow = datetime.now() + timedelta(days=1)
-            when = datetime(tomorrow.year, tomorrow.month, tomorrow.day, 7, 0, 0)
+            # Schedule for 15 minutes from now
+            when = datetime.now() + timedelta(minutes=15)
         
         # Extract weather information
         city = weather_data.get('city', 'Unknown')
@@ -334,7 +336,7 @@ class NotificationManager(QObject):
         
         # Create title and message
         title = f"Weather Forecast for {city}"
-        message = f"Tomorrow's weather: {description}, {temperature}°C"
+        message = f"Current weather: {description}, {temperature}°C"
         
         # Schedule the notification
         return self.schedule_notification(

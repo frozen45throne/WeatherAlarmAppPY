@@ -26,18 +26,18 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 def check_dependencies():
     """Check if all required dependencies are installed."""
     try:
-        import PyQt5
+        import PyQt6
         # Import QtCore separately
-        from PyQt5 import QtCore
-        logger.info(f"PyQt5 version: {QtCore.QT_VERSION_STR}")
+        from PyQt6 import QtCore
+        logger.info(f"PyQt6 version: {QtCore.QT_VERSION_STR}")
         
-        # Check for PyQtWebEngine
+        # Check for PyQt6-WebEngine
         try:
-            from PyQt5 import QtWebEngineWidgets
-            logger.info("PyQtWebEngine is installed")
+            from PyQt6 import QtWebEngineWidgets
+            logger.info("PyQt6-WebEngine is installed")
         except ImportError:
-            logger.warning("PyQtWebEngine is not installed. Weather Map feature will not be available.")
-            logger.warning("Install it using: pip install PyQtWebEngine>=5.15.0")
+            logger.warning("PyQt6-WebEngine is not installed. Weather Map feature will not be available.")
+            logger.warning("Install it using: pip install PyQt6-WebEngine>=6.0.0")
         
         # Check for requests
         try:

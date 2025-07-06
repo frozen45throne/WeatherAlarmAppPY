@@ -1,13 +1,13 @@
 """
-SVG Handler Utility
-------------------
+SVG Handler Module
+---------------
 This module provides utilities for handling SVG files in the Weather & Alarm application.
 """
 import os
 import logging
-from PyQt5.QtSvg import QSvgRenderer
-from PyQt5.QtGui import QPainter, QPixmap
-from PyQt5.QtCore import QSize, Qt
+from PyQt6.QtSvg import QSvgRenderer
+from PyQt6.QtGui import QPainter, QPixmap
+from PyQt6.QtCore import QSize, Qt
 
 from ..config import (
     WEATHER_ICONS_DIR, 
@@ -80,42 +80,46 @@ def render_svg_to_pixmap(svg_path, size=QSize(64, 64)):
     Render an SVG or PNG file to a QPixmap.
     
     Args:
-        svg_path (str): Path to the SVG/PNG file
-        size (QSize): Size of the resulting pixmap
+        svg_path (str): Path to the SVG or PNG file
+        size (QSize, optional): Size of the pixmap
         
     Returns:
-        QPixmap: The rendered pixmap or None if rendering failed
+        QPixmap: Rendered pixmap
     """
-    if not svg_path or not os.path.exists(svg_path):
-        logger.error(f"File does not exist: {svg_path}")
-        return None
+    if not os.path.exists(svg_path):
+        logger.error(f"File not found: {svg_path}")
+        return QPixmap()
     
-    try:
-        # Check if it's a PNG file
-        if svg_path.lower().endswith('.png'):
-            pixmap = QPixmap(svg_path)
-            if pixmap.isNull():
-                logger.error(f"Invalid PNG file: {svg_path}")
-                return None
-            return pixmap.scaled(size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        
-        # Handle SVG file
-        renderer = QSvgRenderer(svg_path)
-        if not renderer.isValid():
-            logger.error(f"Invalid SVG file: {svg_path}")
-            return None
-        
-        pixmap = QPixmap(size)
-        pixmap.fill(Qt.transparent)  # Transparent background
-        
-        painter = QPainter(pixmap)
-        renderer.render(painter)
-        painter.end()
-        
-        return pixmap
-    except Exception as e:
-        logger.error(f"Error rendering file {svg_path}: {str(e)}")
-        return None
+    # Handle PNG files
+    if svg_path.lower().endswith('.png'):
+        pixmap = QPixmap(svg_path)
+        if pixmap.isNull():
+            logger.error(f"Failed to load PNG file: {svg_path}")
+            return QPixmap()
+        return pixmap.scaled(size, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+    
+    # Handle SVG files
+    renderer = QSvgRenderer(svg_path)
+    
+    # Check if the SVG is valid
+    if not renderer.isValid():
+        logger.error(f"Invalid SVG file: {svg_path}")
+        return QPixmap()
+    
+    # Create pixmap
+    pixmap = QPixmap(size)
+    pixmap.fill(Qt.GlobalColor.transparent)  # Transparent background
+    
+    # Create painter
+    painter = QPainter(pixmap)
+    
+    # Render SVG
+    renderer.render(painter)
+    
+    # End painter
+    painter.end()
+    
+    return pixmap
 
 def get_weather_icon_pixmap(icon_code, size=QSize(64, 64)):
     """

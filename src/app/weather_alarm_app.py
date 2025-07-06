@@ -11,10 +11,10 @@ from datetime import datetime
 import time
 import shutil
 
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                             QTabWidget, QStyleFactory, QMessageBox)
-from PyQt5.QtCore import Qt, QTime, QTimer, QSettings
-from PyQt5.QtGui import QIcon, QPalette, QColor
+from PyQt6.QtCore import Qt, QTime, QTimer, QSettings
+from PyQt6.QtGui import QIcon, QPalette, QColor
 from qt_material import apply_stylesheet, list_themes
 
 # Import widgets
@@ -62,12 +62,9 @@ class WeatherAlarmApp(QMainWindow):
         
         # Initialize settings
         self.settings = QSettings("WACAppPush", "settings")
-        self.material_theme = self.settings.value("material_theme", "dark_teal.xml", type=str)
-        self.accent_color = self.settings.value("accent_color", "#009688", type=str)
-        self.density_scale = self.settings.value("density_scale", "0", type=str)
-        self.font_family = self.settings.value("font_family", "Segoe UI", type=str)
-        self.font_size = self.settings.value("font_size", "12px", type=str)
-        self.dark_mode = self.settings.value("dark_mode", False, type=bool)
+        
+        # Set dark mode as the only theme option
+        self.settings.setValue("theme", "dark")
         
         # Load saved API key if available
         saved_api_key = self.settings.value("API_KEY", "")
@@ -75,7 +72,7 @@ class WeatherAlarmApp(QMainWindow):
             global API_KEY
             API_KEY = saved_api_key
         
-        # Create theme manager
+        # Create theme manager (dark mode only)
         self.theme_manager = ThemeManager()
         
         # Initialize weather service
@@ -92,7 +89,7 @@ class WeatherAlarmApp(QMainWindow):
         # Set up timers
         self.setup_timers()
         
-        # Apply theme
+        # Apply dark theme
         self.apply_theme()
         
     def init_ui(self):
@@ -118,22 +115,15 @@ class WeatherAlarmApp(QMainWindow):
         
         # Settings tab
         self.settings_widget = SettingsWidget(self)
+        # Theme-related connections are kept for compatibility but will have no effect
+        # since we're now using dark mode exclusively
         self.settings_widget.theme_changed.connect(self.on_theme_changed)
-        self.settings_widget.accent_color_changed.connect(self.on_accent_color_changed)
-        self.settings_widget.density_scale_changed.connect(self.on_density_changed)
-        self.settings_widget.font_family_changed.connect(self.on_font_family_changed)
-        self.settings_widget.font_size_changed.connect(self.on_font_size_changed)
-        self.settings_widget.dark_mode_changed.connect(self.on_dark_mode_changed)
         self.settings_widget.api_key_changed.connect(self.on_api_key_changed)
         
-        # Set current settings
+        # Set current settings - simplified for dark mode only
         self.settings_widget.set_current_settings(
-            self.material_theme,
-            self.accent_color,
-            self.density_scale,
-            self.font_family,
-            self.font_size,
-            self.dark_mode
+            Theme.DARK,  # Always dark theme
+            self.api_key
         )
         
         # Add tabs to tab widget
@@ -234,48 +224,14 @@ class WeatherAlarmApp(QMainWindow):
         self.alarm_widget.remove_triggered_alarm(alarm_time)
     
     def apply_theme(self):
-        """Apply the current theme to the application"""
+        """Apply dark theme to the application"""
         app = QApplication.instance()
-        self.theme_manager.apply_theme(
-            app,
-            self.material_theme,
-            self.accent_color,
-            self.font_family,
-            self.font_size,
-            self.density_scale,
-            self.dark_mode
-        )
+        self.theme_manager.apply_theme()
     
-    # Settings event handlers
+    # Settings event handlers - simplified for dark mode only
     def on_theme_changed(self, theme):
-        self.material_theme = theme
-        self.settings.setValue("material_theme", theme)
-        self.apply_theme()
-    
-    def on_accent_color_changed(self, color):
-        self.accent_color = color
-        self.settings.setValue("accent_color", color)
-        self.apply_theme()
-    
-    def on_density_changed(self, density):
-        self.density_scale = density
-        self.settings.setValue("density_scale", density)
-        self.apply_theme()
-    
-    def on_font_family_changed(self, font_family):
-        self.font_family = font_family
-        self.settings.setValue("font_family", font_family)
-        self.apply_theme()
-    
-    def on_font_size_changed(self, font_size):
-        self.font_size = font_size
-        self.settings.setValue("font_size", font_size)
-        self.apply_theme()
-    
-    def on_dark_mode_changed(self, enabled):
-        self.dark_mode = enabled
-        self.settings.setValue("dark_mode", enabled)
-        # Note: Restart might be needed for full effect
+        # Always use dark theme, kept for compatibility
+        pass
     
     def on_api_key_changed(self, api_key):
         global API_KEY

@@ -5,18 +5,36 @@ This module provides the NotificationWidget class for displaying and managing no
 """
 import logging
 from datetime import datetime
-from PyQt5.QtWidgets import (
+from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, 
     QFrame, QScrollArea, QListWidget, QListWidgetItem, QMenu,
-    QAction, QTabWidget, QSizePolicy
+    QTabWidget, QSizePolicy
 )
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QFont, QIcon, QColor
+from PyQt6.QtCore import Qt, pyqtSignal, QSize
+from PyQt6.QtGui import QFont, QIcon, QColor, QAction, QPalette
 
 # Configure logging
 logger = logging.getLogger(__name__)
 
-class NotificationItem(QFrame):
+class RoundedFrame(QFrame):
+    """A custom frame with rounded corners and optional background color."""
+    
+    def __init__(self, parent=None, bg_color=None, border_radius=10):
+        super().__init__(parent)
+        self.setFrameShape(QFrame.Shape.NoFrame)
+        
+        # Set background color and border radius
+        style = f"""
+            QFrame {{
+                background-color: {bg_color if bg_color else 'rgba(35, 35, 40, 0.7)'};
+                border-radius: {border_radius}px;
+                padding: 16px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }}
+        """
+        self.setStyleSheet(style)
+
+class NotificationItem(RoundedFrame):
     """Widget for displaying a notification item."""
     
     # Signal emitted when the notification is clicked
@@ -36,7 +54,7 @@ class NotificationItem(QFrame):
             notification (Notification): Notification object
             parent (QWidget, optional): Parent widget
         """
-        super().__init__(parent)
+        super().__init__(parent, bg_color="rgba(40, 40, 50, 0.7)")
         
         # Store notification
         self.notification = notification
@@ -49,32 +67,22 @@ class NotificationItem(QFrame):
     
     def init_ui(self):
         """Initialize the user interface."""
-        # Set frame properties
-        self.setFrameShape(QFrame.StyledPanel)
-        self.setStyleSheet("""
-            QFrame {
-                border: 1px solid #ccc;
-                border-radius: 8px;
-                margin: 2px;
-                padding: 8px;
-            }
-            
-            QFrame:hover {
-                background-color: rgba(240, 240, 240, 0.1);
-            }
-        """)
-        
         # Main layout
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(8, 8, 8, 8)
-        main_layout.setSpacing(4)
+        main_layout.setContentsMargins(12, 12, 12, 12)
+        main_layout.setSpacing(8)
         
         # Header layout
         header_layout = QHBoxLayout()
+        header_layout.setSpacing(12)
         
         # Title label
         self.title_label = QLabel(self.notification.title)
-        self.title_label.setStyleSheet("font-weight: bold; font-size: 14px;")
+        self.title_label.setStyleSheet("""
+            font-weight: bold;
+            font-size: 16px;
+            color: white;
+        """)
         header_layout.addWidget(self.title_label)
         
         # Spacer
@@ -83,7 +91,10 @@ class NotificationItem(QFrame):
         # Time label
         time_str = self.notification.timestamp.strftime("%H:%M")
         self.time_label = QLabel(time_str)
-        self.time_label.setStyleSheet("font-size: 10px;")
+        self.time_label.setStyleSheet("""
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+        """)
         header_layout.addWidget(self.time_label)
         
         main_layout.addLayout(header_layout)
@@ -91,29 +102,72 @@ class NotificationItem(QFrame):
         # Message label
         self.message_label = QLabel(self.notification.message)
         self.message_label.setWordWrap(True)
+        self.message_label.setStyleSheet("""
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            margin: 4px 0;
+        """)
         main_layout.addWidget(self.message_label)
         
         # Footer layout
         footer_layout = QHBoxLayout()
+        footer_layout.setSpacing(12)
         
         # Category label
         category_str = self.notification.category.capitalize()
         self.category_label = QLabel(category_str)
-        self.category_label.setStyleSheet("color: #666; font-size: 11px;")
+        self.category_label.setStyleSheet("""
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+        """)
         footer_layout.addWidget(self.category_label)
         
         # Spacer
         footer_layout.addStretch()
         
+        button_style = """
+            QPushButton {
+                background-color: rgba(50, 50, 60, 0.7);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 6px;
+                padding: 6px 16px;
+                font-size: 13px;
+                min-width: 80px;
+                min-height: 28px;
+            }
+            QPushButton:hover {
+                background-color: rgba(60, 60, 70, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            QPushButton:pressed {
+                background-color: rgba(45, 45, 55, 0.7);
+            }
+            QPushButton:disabled {
+                background-color: rgba(40, 40, 50, 0.4);
+                color: rgba(255, 255, 255, 0.3);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+            }
+        """
+        
         # Mark as read button
         self.read_button = QPushButton("Mark as Read")
-        self.read_button.setStyleSheet("font-size: 11px;")
+        self.read_button.setStyleSheet(button_style)
         self.read_button.clicked.connect(self.on_mark_as_read)
         footer_layout.addWidget(self.read_button)
         
         # Remove button
         self.remove_button = QPushButton("Remove")
-        self.remove_button.setStyleSheet("font-size: 11px;")
+        self.remove_button.setStyleSheet(button_style.replace(
+            "rgba(50, 50, 60, 0.7)",
+            "#EF5350"
+        ).replace(
+            "rgba(60, 60, 70, 0.7)",
+            "#E57373"
+        ).replace(
+            "rgba(45, 45, 55, 0.7)",
+            "#F44336"
+        ))
         self.remove_button.clicked.connect(self.on_remove)
         footer_layout.addWidget(self.remove_button)
         
@@ -129,15 +183,14 @@ class NotificationItem(QFrame):
             self.read_button.setEnabled(False)
             self.setStyleSheet("""
                 QFrame {
-                    border: 1px solid #ccc;
-                    border-radius: 8px;
-                    background-color: rgba(240, 240, 240, 0.6);
+                    background-color: rgba(35, 35, 40, 0.4);
+                    border-radius: 10px;
+                    padding: 16px;
+                    border: 1px solid rgba(255, 255, 255, 0.05);
                     margin: 2px;
-                    padding: 8px;
                 }
-                
                 QFrame:hover {
-                    background-color: rgba(240, 240, 240, 0.9);
+                    background-color: rgba(40, 40, 45, 0.4);
                 }
             """)
         else:
@@ -145,15 +198,15 @@ class NotificationItem(QFrame):
             self.read_button.setEnabled(True)
             self.setStyleSheet("""
                 QFrame {
-                    border: 1px solid #ccc;
-                    border-radius: 8px;
-                    background-color: rgba(255, 255, 255, 0.8);
+                    background-color: rgba(40, 40, 50, 0.7);
+                    border-radius: 10px;
+                    padding: 16px;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
                     margin: 2px;
-                    padding: 8px;
                 }
-                
                 QFrame:hover {
-                    background-color: rgba(240, 240, 240, 0.9);
+                    background-color: rgba(45, 45, 55, 0.7);
+                    border: 1px solid rgba(255, 255, 255, 0.15);
                 }
             """)
     
@@ -164,7 +217,9 @@ class NotificationItem(QFrame):
         Args:
             event (QMouseEvent): Mouse event
         """
-        self.clicked.emit(self.notification)
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.clicked.emit(self.notification)
+            super().mousePressEvent(event)
     
     def on_mark_as_read(self):
         """Handle mark as read button click."""
@@ -220,31 +275,125 @@ class NotificationWidget(QWidget):
         """Initialize the user interface."""
         # Main layout
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(16, 16, 16, 16)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
         
-        # Add title
+        # Create a scroll area with modern styling
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setFrameShape(QFrame.Shape.NoFrame)
+        scroll_area.setStyleSheet("""
+            QScrollArea {
+                background: transparent;
+                border: none;
+            }
+            QScrollBar:vertical {
+                border: none;
+                background: rgba(255, 255, 255, 0.1);
+                width: 8px;
+                border-radius: 4px;
+                margin: 0px;
+            }
+            QScrollBar::handle:vertical {
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 4px;
+                min-height: 30px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background: rgba(255, 255, 255, 0.4);
+            }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                height: 0px;
+            }
+        """)
+        
+        # Create content widget
+        content_widget = QWidget()
+        content_layout = QVBoxLayout(content_widget)
+        content_layout.setContentsMargins(20, 20, 20, 20)
+        content_layout.setSpacing(24)
+        
+        # Add title with modern styling
         title_label = QLabel("Notifications")
-        title_label.setStyleSheet("font-size: 18px; font-weight: bold;")
-        main_layout.addWidget(title_label)
+        title_label.setStyleSheet("""
+            font-size: 28px;
+            font-weight: bold;
+            color: #90CAF9;
+            margin-bottom: 16px;
+            padding-left: 4px;
+        """)
+        content_layout.addWidget(title_label)
         
-        # Add tab widget
+        # Add tab widget with modern styling
         self.tab_widget = QTabWidget()
+        self.tab_widget.setStyleSheet("""
+            QTabWidget::pane {
+                border: none;
+                background: transparent;
+            }
+            QTabBar::tab {
+                background: rgba(40, 40, 50, 0.7);
+                color: rgba(255, 255, 255, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-bottom: none;
+                border-top-left-radius: 6px;
+                border-top-right-radius: 6px;
+                padding: 8px 16px;
+                font-size: 14px;
+                min-width: 100px;
+            }
+            QTabBar::tab:selected {
+                background: rgba(50, 50, 60, 0.7);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-bottom: none;
+            }
+            QTabBar::tab:hover:!selected {
+                background: rgba(45, 45, 55, 0.7);
+                color: rgba(255, 255, 255, 0.8);
+            }
+        """)
         
         # Create all notifications tab
         self.all_tab = QWidget()
         all_layout = QVBoxLayout(self.all_tab)
-        all_layout.setContentsMargins(0, 0, 0, 0)
+        all_layout.setContentsMargins(0, 16, 0, 0)
+        all_layout.setSpacing(8)
         
         # Create scroll area for all notifications
         all_scroll = QScrollArea()
         all_scroll.setWidgetResizable(True)
-        all_scroll.setFrameShape(QFrame.NoFrame)
+        all_scroll.setFrameShape(QFrame.Shape.NoFrame)
+        all_scroll.setStyleSheet("""
+            QScrollArea {
+                background: transparent;
+                border: none;
+            }
+            QScrollBar:vertical {
+                border: none;
+                background: rgba(255, 255, 255, 0.1);
+                width: 8px;
+                border-radius: 4px;
+                margin: 0px;
+            }
+            QScrollBar::handle:vertical {
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 4px;
+                min-height: 30px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background: rgba(255, 255, 255, 0.4);
+            }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                height: 0px;
+            }
+        """)
         
         # Create widget to hold all notifications
         self.all_notifications_widget = QWidget()
         self.all_notifications_layout = QVBoxLayout(self.all_notifications_widget)
         self.all_notifications_layout.setContentsMargins(0, 0, 0, 0)
-        self.all_notifications_layout.setSpacing(8)
+        self.all_notifications_layout.setSpacing(12)
         self.all_notifications_layout.addStretch()
         
         all_scroll.setWidget(self.all_notifications_widget)
@@ -253,51 +402,91 @@ class NotificationWidget(QWidget):
         # Create unread notifications tab
         self.unread_tab = QWidget()
         unread_layout = QVBoxLayout(self.unread_tab)
-        unread_layout.setContentsMargins(0, 0, 0, 0)
+        unread_layout.setContentsMargins(0, 16, 0, 0)
+        unread_layout.setSpacing(8)
         
         # Create scroll area for unread notifications
         unread_scroll = QScrollArea()
         unread_scroll.setWidgetResizable(True)
-        unread_scroll.setFrameShape(QFrame.NoFrame)
+        unread_scroll.setFrameShape(QFrame.Shape.NoFrame)
+        unread_scroll.setStyleSheet(all_scroll.styleSheet())
         
         # Create widget to hold unread notifications
         self.unread_notifications_widget = QWidget()
         self.unread_notifications_layout = QVBoxLayout(self.unread_notifications_widget)
         self.unread_notifications_layout.setContentsMargins(0, 0, 0, 0)
-        self.unread_notifications_layout.setSpacing(8)
+        self.unread_notifications_layout.setSpacing(12)
         self.unread_notifications_layout.addStretch()
         
         unread_scroll.setWidget(self.unread_notifications_widget)
         unread_layout.addWidget(unread_scroll)
         
-        # Add tabs to tab widget
+        # Add tabs
         self.tab_widget.addTab(self.all_tab, "All")
-        self.tab_widget.addTab(self.unread_tab, "Unread (0)")
+        self.tab_widget.addTab(self.unread_tab, "Unread")
         
-        main_layout.addWidget(self.tab_widget)
+        # Add buttons with modern styling
+        buttons_layout = QHBoxLayout()
+        buttons_layout.setSpacing(12)
         
-        # Add buttons
-        button_layout = QHBoxLayout()
+        button_style = """
+            QPushButton {
+                background-color: rgba(50, 50, 60, 0.7);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 6px;
+                padding: 8px 20px;
+                font-size: 14px;
+                font-weight: bold;
+                min-width: 120px;
+                min-height: 36px;
+            }
+            QPushButton:hover {
+                background-color: rgba(60, 60, 70, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            QPushButton:pressed {
+                background-color: rgba(45, 45, 55, 0.7);
+            }
+        """
         
         # Mark all as read button
         mark_all_button = QPushButton("Mark All as Read")
         mark_all_button.clicked.connect(self.on_mark_all_as_read)
+        mark_all_button.setStyleSheet(button_style)
+        buttons_layout.addWidget(mark_all_button)
         
         # Clear all button
         clear_all_button = QPushButton("Clear All")
         clear_all_button.clicked.connect(self.on_clear_all)
+        clear_all_button.setStyleSheet(button_style.replace(
+            "rgba(50, 50, 60, 0.7)",
+            "#EF5350"
+        ).replace(
+            "rgba(60, 60, 70, 0.7)",
+            "#E57373"
+        ).replace(
+            "rgba(45, 45, 55, 0.7)",
+            "#F44336"
+        ))
+        buttons_layout.addWidget(clear_all_button)
         
-        button_layout.addWidget(mark_all_button)
-        button_layout.addWidget(clear_all_button)
+        buttons_layout.addStretch()
         
-        main_layout.addLayout(button_layout)
+        # Add widgets to main layout
+        content_layout.addWidget(self.tab_widget)
+        content_layout.addLayout(buttons_layout)
+        
+        # Set the content widget as the scroll area's widget
+        scroll_area.setWidget(content_widget)
+        main_layout.addWidget(scroll_area)
         
         # Store notification items
         self.notification_items = {}
         
         # Add a placeholder message when there are no notifications
         self.no_notifications_label = QLabel("No notifications to display")
-        self.no_notifications_label.setAlignment(Qt.AlignCenter)
+        self.no_notifications_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.no_notifications_label.setStyleSheet("color: #888; margin: 20px;")
         self.all_notifications_layout.insertWidget(0, self.no_notifications_label)
     

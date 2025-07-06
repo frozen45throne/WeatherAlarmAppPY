@@ -17,8 +17,8 @@ def main():
             sys.path.insert(0, current_dir)
         
         # Import required PyQt modules first to avoid import errors
-        from PyQt5.QtWidgets import QApplication, QStyleFactory, QMessageBox
-        from PyQt5.QtCore import Qt
+        from PyQt6.QtWidgets import QApplication, QStyleFactory, QMessageBox
+        from PyQt6.QtCore import Qt
         
         # Import application modules
         from src.utils.theme_utils import ThemeManager
@@ -41,14 +41,14 @@ def main():
         window.show()
         
         # Start the application event loop
-        sys.exit(app.exec_())
+        sys.exit(app.exec())
         
     except ImportError as e:
         # Handle import errors specifically
         error_msg = f"Import Error: {str(e)}\n\n"
         error_msg += "This is likely due to a missing dependency or incorrect import path.\n"
         error_msg += "Please ensure you have installed all required packages:\n"
-        error_msg += "  - PyQt5\n  - qt-material\n  - requests\n\n"
+        error_msg += "  - PyQt6\n  - qt-material\n  - requests\n\n"
         error_msg += "Detailed error information:\n"
         error_msg += traceback.format_exc()
         
@@ -56,7 +56,7 @@ def main():
         
         # Try to show a GUI error message if possible
         try:
-            from PyQt5.QtWidgets import QApplication, QMessageBox
+            from PyQt6.QtWidgets import QApplication, QMessageBox
             app = QApplication(sys.argv)
             QMessageBox.critical(None, "Application Error", error_msg)
         except:
@@ -76,7 +76,7 @@ def main():
         
         # Try to show a GUI error message if possible
         try:
-            from PyQt5.QtWidgets import QApplication, QMessageBox
+            from PyQt6.QtWidgets import QApplication, QMessageBox
             app = QApplication(sys.argv)
             QMessageBox.critical(None, "Application Error", error_msg)
         except:
