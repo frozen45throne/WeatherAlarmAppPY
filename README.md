@@ -149,8 +149,8 @@ A modern desktop application that combines weather information, alarm management
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/weather-alarm-app.git
-   cd weather-alarm-app
+   git clone https://github.com/frozen45throne/WeatherAlarmAppPY.git
+   cd WeatherAlarmAppPY
    ```
 
 2. Install the required packages:
