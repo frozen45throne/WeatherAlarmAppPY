@@ -188,7 +188,7 @@ class NoteDialog(QDialog):
         category_layout.addWidget(self.category_combo)
         category_layout.addStretch()
         
-        form_layout.addLayout(category_layout)
+        form_layout.addRow(category_layout)
         
         # Content field
         self.content_edit = QTextEdit(self.note.content)
@@ -274,6 +274,7 @@ class NoteWidget(QWidget):
         """
         super().__init__(parent)
         self.notes = []
+        self.categories = ["General", "Work", "Personal", "Shopping", "Ideas", "Other"]
         self.notes_file = os.path.join(os.path.expanduser("~"), ".wacapp_notes.json")
         self.load_notes()
         self.init_ui()
@@ -484,11 +485,17 @@ class NoteWidget(QWidget):
         self.update_notes_list()
     
     def load_notes(self):
-        """Load notes from file."""
+        """Load notes and categories from file."""
         try:
             if os.path.exists(self.notes_file):
                 with open(self.notes_file, 'r') as f:
-                    notes_data = json.load(f)
+                    data = json.load(f)
+                    if isinstance(data, dict):
+                        notes_data = data.get('notes', [])
+                        self.categories = data.get('categories', ["General", "Work", "Personal", "Shopping", "Ideas", "Other"])
+                    else:
+                        notes_data = data
+                        self.categories = ["General", "Work", "Personal", "Shopping", "Ideas", "Other"]
                     self.notes = [Note.from_dict(note_data) for note_data in notes_data]
                     logger.info(f"Loaded {len(self.notes)} notes from {self.notes_file}")
             else:
@@ -502,12 +509,16 @@ class NoteWidget(QWidget):
             )
     
     def save_notes(self):
-        """Save notes to file."""
+        """Save notes and categories to file."""
         try:
             notes_data = [note.to_dict() for note in self.notes]
+            data = {
+                'notes': notes_data,
+                'categories': self.categories
+            }
             with open(self.notes_file, 'w') as f:
-                json.dump(notes_data, f, indent=2)
-            logger.info(f"Saved {len(self.notes)} notes to {self.notes_file}")
+                json.dump(data, f, indent=2)
+            logger.info(f"Saved {len(self.notes)} notes and {len(self.categories)} categories to {self.notes_file}")
         except Exception as e:
             logger.error(f"Error saving notes: {e}")
             QMessageBox.warning(
@@ -518,42 +529,40 @@ class NoteWidget(QWidget):
     
     def update_notes_list(self):
         """Update the notes list."""
-        # Clear the list
         self.notes_list.clear()
-        
-        # Filter notes
         filtered_notes = self.filter_notes()
-        
-        # Add notes to the list
+        # Sort notes by category, then by created date (descending)
+        filtered_notes.sort(key=lambda n: (n.category, -n.created.timestamp()))
         for note in filtered_notes:
-            # Create list item
-            item = QListWidgetItem(note.title)
-            
-            # Set data
+            # Show title and category
+            item = QListWidgetItem(f"{note.title}  [{note.category}]")
             item.setData(Qt.ItemDataRole.UserRole, note.id)
-            
-            # Add to list
             self.notes_list.addItem(item)
     
     def filter_notes(self):
         """Filter notes based on search text and category."""
         search_text = ""
-        selected_category = self.filter_combo.currentText()
-        
+        # Check if filter_combo exists and is not deleted
+        try:
+            selected_category = self.filter_combo.currentText()
+        except RuntimeError:
+            # Widget has been deleted, return all notes
+            return self.notes
+
         filtered = []
         for note in self.notes:
             # Check if note matches search text
             text_match = (not search_text or 
                          search_text in note.title.lower() or 
                          search_text in note.content.lower())
-            
+
             # Check if note matches category filter
             category_match = (selected_category == "All" or 
                              selected_category == note.category)
-            
+
             if text_match and category_match:
                 filtered.append(note)
-        
+
         return filtered
     
     def get_selected_note(self):
@@ -657,10 +666,15 @@ class NoteWidget(QWidget):
             "Add Category",
             "Enter new category name:"
         )
-        
+
         if ok and category:
-            # Add the category to the filter
-            if self.filter_combo.findText(category) == -1:
-                self.filter_combo.addItem(category)
-                self.filter_combo.setCurrentText(category)
-                logger.info(f"Added new category: {category}") 
+            # Check if filter_combo exists and is not deleted
+            try:
+                combo = self.filter_combo
+                if combo.findText(category) == -1:
+                    combo.addItem(category)
+                    combo.setCurrentText(category)
+                    logger.info(f"Added new category: {category}")
+            except RuntimeError:
+                # Widget has been deleted, do nothing
+                return

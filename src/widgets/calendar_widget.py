@@ -517,22 +517,21 @@ class CalendarWidget(QWidget):
         
         # Create event dialog
         dialog = EventDialog(self)
-        dialog.date_edit.setDate(selected_date)
+        dialog.date_edit.setSelectedDate(selected_date)
         
         # Show dialog
         if dialog.exec() == QDialog.DialogCode.Accepted:
             # Get event data
             event_data = dialog.get_event_data()
-            
-            # Add event to list
-            self.events.append(event_data)
-            
+            date_str = event_data['date'].toString(Qt.DateFormat.ISODate)
+            if date_str not in self.events:
+                self.events[date_str] = []
+            # Add event to the correct date list
+            self.events[date_str].append(event_data)
             # Update events list
             self.update_events_list()
-            
             # Emit signal
             self.event_updated.emit(event_data)
-            
             logger.info(f"Added event: {event_data}")
     
     def edit_event(self, item):
@@ -618,7 +617,7 @@ class CalendarWidget(QWidget):
             list: List of events
         """
         date_str = date.toString(Qt.DateFormat.ISODate)
-        return [event for event in self.events if event['date'].toString(Qt.DateFormat.ISODate) == date_str]
+        return self.events.get(date_str, [])
     
     def get_all_events(self):
         """
@@ -632,4 +631,4 @@ class CalendarWidget(QWidget):
     def apply_theme(self):
         """Apply the current theme to the calendar widget."""
         # This method is no longer needed as we're using RoundedFrame and modern styling
-        pass 
+        pass
